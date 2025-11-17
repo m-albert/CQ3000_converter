@@ -26,8 +26,8 @@ joblib = ">=1.5.2,<2"
 
 [pypi-dependencies]
 #fractal-uzh-converters = { git = "https://github.com/fractal-analytics-platform/fractal-uzh-converters.git" }
-#fractal-uzh-converters = { git = "https://github.com/fractal-analytics-platform/fractal-uzh-converters.git" }
+fractal-uzh-converters = { git = "https://github.com/fractal-analytics-platform/fractal-uzh-converters.git" }
 
-fractal-uzh-converters = { path = "/Users/albertm/software/fractal-uzh-converters", editable = true }
+#fractal-uzh-converters = { path = "/Users/albertm/software/fractal-uzh-converters", editable = true }
 #ngff-zarr = ">=0.19.1, <0.20"
 multiview-stitcher = ">=0.1.41, <0.2"
