@@ -2,7 +2,7 @@
 authors = ["Marvin Albert <marvin.albert@gmail.com>"]
 channels = ["conda-forge"]
 name = "CQ3000_converter"
-platforms = ["osx-arm64"]
+platforms = ["osx-arm64", "win-64", "linux-64"]
 version = "0.1.0"
 
 [tasks]
