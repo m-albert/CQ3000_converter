@@ -30,4 +30,6 @@ fractal-uzh-converters = { git = "https://github.com/fractal-analytics-platform/
 
 #fractal-uzh-converters = { path = "/Users/albertm/software/fractal-uzh-converters", editable = true }
 #ngff-zarr = ">=0.19.1, <0.20"
-multiview-stitcher = ">=0.1.41, <0.2"
+multiview-stitcher = ">=0.1.42, <0.2"
+#multiview-stitcher = { path = "/Users/albertm/software/multiview-stitcher", editable = true }
+
