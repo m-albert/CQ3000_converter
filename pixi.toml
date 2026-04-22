@@ -7,29 +7,4 @@ version = "0.1.0"
 
 [tasks]
 # CQ3000 Converter CLI - Entry point to the Typer CLI
-convert-to-ome-zarr = "python convert-to-ome-zarr.py"
-
-[dependencies]
-python = ">=3.11.0,<3.14"
-ipython = "*"
-jupyter = "*"
-ipympl = "*"
-zarr = "<3"
-ome-zarr = "*"
-xarray = "*"
-dask = "==2024.11.2"
-ipykernel = ">=7.1.0,<8"
-pip = ">=25.2,<26"
-typer = ">=0.20.0,<0.21"
-rich = ">=13.0.0"
-joblib = ">=1.5.2,<2"
-
-[pypi-dependencies]
-#fractal-uzh-converters = { git = "https://github.com/fractal-analytics-platform/fractal-uzh-converters.git" }
-fractal-uzh-converters = { git = "https://github.com/fractal-analytics-platform/fractal-uzh-converters.git" }
-
-#fractal-uzh-converters = { path = "/Users/albertm/software/fractal-uzh-converters", editable = true }
-#ngff-zarr = ">=0.19.1, <0.20"
-multiview-stitcher = ">=0.1.42, <0.2"
-#multiview-stitcher = { path = "/Users/albertm/software/multiview-stitcher", editable = true }
-
+convert-to-ome-zarr = "python convert_to_ome_zarr.py"
