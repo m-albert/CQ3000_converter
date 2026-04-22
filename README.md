@@ -23,8 +23,6 @@ uvx --from git+https://github.com/m-albert/CQ3000_converter convert-to-ome-zarr 
 
 ### Local usage
 
-
-
 ```bash
 # Show help
 uv run convert-to-ome-zarr --help
