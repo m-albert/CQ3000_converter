@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-convert-to-ome-zarr = "convert_to_ome_zarr:app"
+cq3000-to-ome-zarr = "convert_to_ome_zarr:app"
 
 [tool.hatch.metadata]
 allow-direct-references = true

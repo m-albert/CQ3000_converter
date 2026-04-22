@@ -7,4 +7,4 @@ version = "0.1.0"
 
 [tasks]
 # CQ3000 Converter CLI - Entry point to the Typer CLI
-convert-to-ome-zarr = "python convert_to_ome_zarr.py"
+cq3000-to-ome-zarr = "python convert_to_ome_zarr.py"

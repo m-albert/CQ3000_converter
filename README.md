@@ -12,26 +12,26 @@ Note: `uv` is required to run the commands without installing the package itself
 
 ```bash
 # Show help
-uvx --from git+https://github.com/m-albert/CQ3000_converter convert-to-ome-zarr --help
+uvx --from git+https://github.com/m-albert/CQ3000_converter cq3000-to-ome-zarr --help
 
 # Convert a single acquisition
-uvx --from git+https://github.com/m-albert/CQ3000_converter convert-to-ome-zarr convert /path/to/input /path/to/output.zarr
+uvx --from git+https://github.com/m-albert/CQ3000_converter cq3000-to-ome-zarr convert /path/to/input /path/to/output.zarr
 
 # Batch convert multiple acquisitions
-uvx --from git+https://github.com/m-albert/CQ3000_converter convert-to-ome-zarr batch -i /path/to/data1 -i /path/to/data2 -o /output/dir
+uvx --from git+https://github.com/m-albert/CQ3000_converter cq3000-to-ome-zarr batch -i /path/to/data1 -i /path/to/data2 -o /output/dir
 ```
 
 ### Local usage
 
 ```bash
 # Show help
-uv run convert-to-ome-zarr --help
+uv run cq3000-to-ome-zarr --help
 
 # Convert a single acquisition
-uv run convert-to-ome-zarr convert /path/to/input /path/to/output.zarr
+uv run cq3000-to-ome-zarr convert /path/to/input /path/to/output.zarr
 
 # Batch convert multiple acquisitions
-uv run convert-to-ome-zarr batch -i /path/to/data1 -i /path/to/data2 -o /output/dir
+uv run cq3000-to-ome-zarr batch -i /path/to/data1 -i /path/to/data2 -o /output/dir
 ```
 
 ## Installation
