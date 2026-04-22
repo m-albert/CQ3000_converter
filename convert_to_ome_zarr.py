@@ -59,14 +59,12 @@ def convert(
             exists=True,
             file_okay=False,
             dir_okay=True,
-            resolve_path=True,
         ),
     ],
     output_zarr: Annotated[
         Path,
         typer.Argument(
             help="Path to output OME-Zarr directory",
-            resolve_path=True,
         ),
     ],
     acquisition_id: Annotated[
@@ -226,7 +224,6 @@ def batch(
             exists=True,
             file_okay=True,
             dir_okay=False,
-            resolve_path=True,
         ),
     ] = None,
     input_paths: Annotated[
@@ -243,7 +240,6 @@ def batch(
             "--output-dir",
             "-o",
             help="Base output directory for all conversions",
-            resolve_path=True,
         ),
     ] = None,
     overwrite: Annotated[
