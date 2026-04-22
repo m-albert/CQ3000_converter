@@ -6,10 +6,11 @@ from pathlib import Path
 from typing import Optional, List
 import warnings
 
+import joblib
 import typer
 from typing_extensions import Annotated
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn, MofNCompleteColumn, TimeElapsedColumn
 
 from fractal_uzh_converters.common.image_in_plate_compute_task import (
     image_in_plate_compute_task,
@@ -41,6 +42,12 @@ def _suppress_known_runtime_warnings() -> None:
         category=UserWarning,
         module=r"anndata\._io\.zarr",
     )
+
+
+def _compute_task_worker(**kwargs):
+    """Run image_in_plate_compute_task with warning suppression (safe in worker processes)."""
+    _suppress_known_runtime_warnings()
+    return image_in_plate_compute_task(**kwargs)
 
 
 @app.command()
@@ -86,6 +93,20 @@ def convert(
             help="Show progress bar during conversion",
         ),
     ] = True,
+    parallel: Annotated[
+        bool,
+        typer.Option(
+            "--parallel/--no-parallel",
+            help="Process tasks in parallel using joblib",
+        ),
+    ] = True,
+    n_jobs: Annotated[
+        int,
+        typer.Option(
+            "--n-jobs",
+            help="Number of parallel jobs (-1 = all CPUs)",
+        ),
+    ] = -1,
 ) -> None:
     """
     Convert a CQ3000 acquisition to OME-Zarr format.
@@ -132,7 +153,29 @@ def convert(
         # Step 2: Run compute tasks
         console.print("[bold green]Step 2:[/bold green] Converting data...")
 
-        if show_progress:
+        parallelization_list = p_list["parallelization_list"]
+
+        if parallel:
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                MofNCompleteColumn(),
+                TimeElapsedColumn(),
+                console=console,
+                transient=False,
+            ) as progress:
+                task = progress.add_task(
+                    "Converting (parallel)...",
+                    total=num_tasks,
+                )
+                for _ in joblib.Parallel(
+                    n_jobs=n_jobs, return_as="generator_unordered", verbose=0
+                )(
+                    joblib.delayed(_compute_task_worker)(**p)
+                    for p in parallelization_list
+                ):
+                    progress.advance(task)
+        elif show_progress:
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
@@ -143,11 +186,10 @@ def convert(
                     total=num_tasks,
                 )
 
-                for i, p in enumerate(p_list["parallelization_list"]):
+                for i, p in enumerate(parallelization_list):
                     progress.update(task, description=f"Processing task {i+1}/{num_tasks}...")
-                    results = image_in_plate_compute_task(**p)
+                    results = _compute_task_worker(**p)
 
-                    # Validate results
                     if "image_list_updates" not in results:
                         console.print(
                             f"[bold yellow]Warning:[/bold yellow] Task {i+1} missing image_list_updates",
@@ -155,9 +197,9 @@ def convert(
 
                     progress.advance(task)
         else:
-            for i, p in enumerate(p_list["parallelization_list"]):
+            for i, p in enumerate(parallelization_list):
                 console.print(f"Processing task {i+1}/{num_tasks}...")
-                results = image_in_plate_compute_task(**p)
+                results = _compute_task_worker(**p)
 
                 if "image_list_updates" not in results:
                     console.print(
@@ -211,6 +253,20 @@ def batch(
             help="Overwrite existing outputs",
         ),
     ] = False,
+    parallel: Annotated[
+        bool,
+        typer.Option(
+            "--parallel/--no-parallel",
+            help="Process tasks in parallel using joblib",
+        ),
+    ] = True,
+    n_jobs: Annotated[
+        int,
+        typer.Option(
+            "--n-jobs",
+            help="Number of parallel jobs (-1 = all CPUs)",
+        ),
+    ] = -1,
 ) -> None:
     """
     Batch convert multiple CQ3000 acquisitions.
@@ -272,16 +328,38 @@ def batch(
             )
 
             # Convert
-            with Progress(
-                SpinnerColumn(),
-                TextColumn("[progress.description]{task.description}"),
-                console=console,
-            ) as progress:
-                task = progress.add_task("Converting...", total=len(p_list["parallelization_list"]))
+            n_tasks = len(p_list["parallelization_list"])
+            if parallel:
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    MofNCompleteColumn(),
+                    TimeElapsedColumn(),
+                    console=console,
+                    transient=False,
+                ) as progress:
+                    task = progress.add_task(
+                        "Converting (parallel)...",
+                        total=n_tasks,
+                    )
+                    for _ in joblib.Parallel(
+                        n_jobs=n_jobs, return_as="generator_unordered", verbose=0
+                    )(
+                        joblib.delayed(_compute_task_worker)(**p)
+                        for p in p_list["parallelization_list"]
+                    ):
+                        progress.advance(task)
+            else:
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    console=console,
+                ) as progress:
+                    task = progress.add_task("Converting...", total=len(p_list["parallelization_list"]))
 
-                for p in p_list["parallelization_list"]:
-                    image_in_plate_compute_task(**p)
-                    progress.advance(task)
+                    for p in p_list["parallelization_list"]:
+                        _compute_task_worker(**p)
+                        progress.advance(task)
 
             console.print(f"[green]✓ Completed: {input_path.name}[/green]")
             success_count += 1
