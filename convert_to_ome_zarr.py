@@ -12,13 +12,15 @@ from typing_extensions import Annotated
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, MofNCompleteColumn, TimeElapsedColumn
 
-from fractal_uzh_converters.common.image_in_plate_compute_task import (
-    image_in_plate_compute_task,
+from ome_zarr_converters_tools import AdvancedComputeOptions
+from fractal_uzh_converters.cq3k.convert_cq3k_compute_task import (
+    convert_cq3k_compute_task,
 )
 from fractal_uzh_converters.cq3k.convert_cq3k_init_task import (
-    CQ3KAcquisitionModel,
-    OverwriteMode,
     convert_cq3k_init_task,
+)
+from fractal_uzh_converters.olympus_scanr.convert_scanr_init_task import (
+    AcquisitionInputModel,
 )
 
 app = typer.Typer(
@@ -27,11 +29,6 @@ app = typer.Typer(
     add_completion=False,
 )
 console = Console()
-
-
-def _to_overwrite_mode(overwrite: bool) -> OverwriteMode:
-    """Map CLI boolean flag to the converter overwrite enum."""
-    return OverwriteMode.OVERWRITE if overwrite else OverwriteMode.NO_OVERWRITE
 
 
 def _suppress_known_runtime_warnings() -> None:
@@ -45,9 +42,9 @@ def _suppress_known_runtime_warnings() -> None:
 
 
 def _compute_task_worker(**kwargs):
-    """Run image_in_plate_compute_task with warning suppression (safe in worker processes)."""
+    """Run convert_cq3k_compute_task with warning suppression (safe in worker processes)."""
     _suppress_known_runtime_warnings()
-    return image_in_plate_compute_task(**kwargs)
+    return convert_cq3k_compute_task(**kwargs)
 
 
 @app.command()
@@ -136,12 +133,13 @@ def convert(
         p_list = convert_cq3k_init_task(
             zarr_dir=str(output_zarr),
             acquisitions=[
-                CQ3KAcquisitionModel(
+                AcquisitionInputModel(
                     path=str(input_path),
                     acquisition_id=acquisition_id,
                 ),
             ],
-            overwrite=_to_overwrite_mode(overwrite),
+            overwrite=overwrite,
+            advanced_options=AdvancedComputeOptions(invert_y=True),
         )
 
         num_tasks = len(p_list["parallelization_list"])
@@ -315,12 +313,13 @@ def batch(
             p_list = convert_cq3k_init_task(
                 zarr_dir=str(output_zarr),
                 acquisitions=[
-                    CQ3KAcquisitionModel(
+                    AcquisitionInputModel(
                         path=str(input_path),
                         acquisition_id=idx - 1,
                     ),
                 ],
-                overwrite=_to_overwrite_mode(overwrite),
+                overwrite=overwrite,
+                advanced_options=AdvancedComputeOptions(invert_y=True),
             )
 
             # Convert
