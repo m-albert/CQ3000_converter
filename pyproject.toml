@@ -14,7 +14,6 @@ dependencies = [
   "rich>=13.0.0",
   "typing_extensions>=4,<5",
   "joblib>=1.3",
-  "ome-zarr-converters-tools",
   "fractal-uzh-converters @ git+https://github.com/fractal-analytics-platform/fractal-uzh-converters.git@v0.5.1",
 ]
 
@@ -23,14 +22,6 @@ cq3000-to-ome-zarr = "convert_to_ome_zarr:app"
 
 [tool.hatch.metadata]
 allow-direct-references = true
-
-[tool.uv]
-override-dependencies = [
-  "ome-zarr-converters-tools",
-]
-
-[tool.uv.sources]
-ome-zarr-converters-tools = { git = "https://github.com/m-albert/ome-zarr-converters-tools", branch = "fix_windows_paths" }
 
 [tool.hatch.build.targets.wheel]
 only-include = ["convert_to_ome_zarr.py"]
